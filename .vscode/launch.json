@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ESP-IDF: JTAG Debug (FT2232H + OpenOCD)",
+      "type": "espidf",
+      "request": "launch",
+      "mode": "auto",
+      "verifyAppBinBeforeDebug": false
+    },
+    {
+      "name": "QEMU Debug (xtensa-esp32-elf-gdb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "MIMode": "gdb",
+      "miDebuggerPath": "${workspaceFolder}/scripts/idf-gdb.sh",
+      "miDebuggerServerAddress": "localhost:1234",
+      "program": "${workspaceFolder}/projects/${input:projectName}/build/${input:projectName}.elf",
+      "cwd": "${workspaceFolder}/projects/${input:projectName}",
+      "stopAtEntry": true,
+      "externalConsole": false,
+      "preLaunchTask": "IDF: QEMU GDB server",
+      "setupCommands": [
+        { "text": "set remotetimeout 60" },
+        { "text": "set mem inaccessible-by-default off" },
+        { "text": "tbreak app_main" }
+      ],
+      "osx": { "MIMode": "gdb" }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "projectName",
+      "type": "pickString",
+      "description": "Select ESP-IDF project to debug",
+      "options": ["hello_world", "blink"],
+      "default": "hello_world"
+    }
+  ]
+}

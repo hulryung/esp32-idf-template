@@ -66,6 +66,45 @@ This is esp32 chip with 2 CPU core(s), WiFi/BTBLE, silicon revision v3.0, 2MB ex
 idf.py -p /dev/cu.usbserial-XXXX flash monitor    # Ctrl+] to exit monitor
 ```
 
+## VSCode workflow
+
+The repo ships with a `.vscode/` config that integrates the official Espressif ESP-IDF extension. First-time setup:
+
+1. Install [VSCode](https://code.visualstudio.com), open this folder, and accept the recommended extensions prompt (`espressif.esp-idf-extension`, `ms-vscode.cpptools`).
+2. The Espressif extension will pick up `${workspaceFolder}/esp-idf` automatically thanks to the workspace `idf.espIdfPath` setting.
+
+**Build / Flash / Monitor** — Cmd+Shift+P → `Tasks: Run Task`:
+
+| Task | What it does |
+|---|---|
+| `IDF: Set target` | Prompts for project + chip, runs `idf.py set-target` |
+| `IDF: Menuconfig` | sdkconfig TUI in the terminal |
+| `IDF: Build` (default build task, ⇧⌘B) | `idf.py build` |
+| `IDF: Flash + Monitor` | Prompts for serial port and project |
+| `IDF: QEMU run` | Emulate without hardware |
+
+All tasks prompt for which project (`hello_world` / `blink`). To add more, edit `.vscode/tasks.json` → `inputs[projectName].options`.
+
+**Debug** (F5):
+
+- **`QEMU Debug (xtensa-esp32-elf-gdb)`** — no hardware needed. Starts QEMU with `--gdb`, attaches GDB, breaks at `app_main`. Stable across IDF/toolchain upgrades because GDB launches via `scripts/idf-gdb.sh`.
+- **`ESP-IDF: JTAG Debug (FT2232H + OpenOCD)`** — real hardware via JTAG. Defaults to OpenOCD config `interface/ftdi/esp32_devkitj_v1.cfg` + `target/esp32.cfg`. For other FTDI breakouts (Adafruit FT232H, Tigard, ESP-Prog, etc.), edit `idf.openOcdConfigs` in `.vscode/settings.json` — common alternatives:
+  - ESP-Prog: `interface/ftdi/esp_usb_jtag.cfg` (newer) or `interface/ftdi/esp32_devkitj_v1.cfg`
+  - Tigard: `interface/ftdi/tigard.cfg`
+  - C232HM cable: `interface/ftdi/c232hm-edhsl-0.cfg`
+
+**JTAG wiring for ESP32-WROOM-32E**
+
+| Signal | ESP32 GPIO | FT2232H pin (typical) |
+|---|---|---|
+| TCK  | GPIO13 | ADBUS0 |
+| TMS  | GPIO14 | ADBUS3 |
+| TDI  | GPIO12 | ADBUS1 |
+| TDO  | GPIO15 | ADBUS2 |
+| GND  | GND    | GND |
+
+Note: GPIO12 is a strapping pin — pull it low (or leave floating) at reset, or you may brick boot mode until reflashed.
+
 ## Projects
 
 | Path | Description |

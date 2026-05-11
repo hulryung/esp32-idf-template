@@ -1,0 +1,120 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "projectName",
+      "type": "pickString",
+      "description": "Select ESP-IDF project",
+      "options": ["hello_world", "blink"],
+      "default": "hello_world"
+    },
+    {
+      "id": "serialPort",
+      "type": "promptString",
+      "description": "Serial port (e.g. /dev/cu.usbserial-XXXX)",
+      "default": "/dev/cu.usbserial-0001"
+    },
+    {
+      "id": "targetChip",
+      "type": "pickString",
+      "description": "ESP-IDF target chip",
+      "options": ["esp32", "esp32s2", "esp32s3", "esp32c3", "esp32c6", "esp32h2"],
+      "default": "esp32"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "IDF: Set target",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": ["projects/${input:projectName}", "idf.py", "set-target", "${input:targetChip}"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: Menuconfig",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": ["projects/${input:projectName}", "idf.py", "menuconfig"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: Build",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": ["projects/${input:projectName}", "idf.py", "build"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "IDF: Clean",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": ["projects/${input:projectName}", "idf.py", "clean"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: Fullclean",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": ["projects/${input:projectName}", "idf.py", "fullclean"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: Flash + Monitor",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": [
+        "projects/${input:projectName}",
+        "idf.py", "-p", "${input:serialPort}", "flash", "monitor"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: Monitor",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": [
+        "projects/${input:projectName}",
+        "idf.py", "-p", "${input:serialPort}", "monitor"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: QEMU run",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": ["projects/${input:projectName}", "idf.py", "qemu", "--qemu-extra-args=-nographic"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "IDF: QEMU GDB server",
+      "detail": "Start QEMU with GDB server on :1234, halted. Used by the 'QEMU Debug' launch config.",
+      "type": "shell",
+      "command": "./scripts/idf-run.sh",
+      "args": [
+        "projects/${input:projectName}",
+        "idf.py", "qemu", "--gdb", "--qemu-extra-args=-nographic"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          { "regexp": ".", "file": 1, "location": 2, "message": 3 }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": ".*(qemu-system-xtensa|Waiting for GDB|gdbserver listening|listening on).*"
+        }
+      }
+    }
+  ]
+}

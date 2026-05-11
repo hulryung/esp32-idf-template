@@ -9,7 +9,7 @@ dependencies.lock
 managed_components/
 
 # Editor / OS
-.vscode/
+# .vscode/ is committed — it ships the build/debug config for this template
 .idea/
 .DS_Store
 *.swp
