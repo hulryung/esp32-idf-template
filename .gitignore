@@ -1,0 +1,25 @@
+# ESP-IDF SDK — installed by setup.sh, not committed
+esp-idf/
+
+# Build artifacts
+build/
+**/build/
+sdkconfig.old
+dependencies.lock
+managed_components/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Logs / coredumps
+*.log
+core.*
